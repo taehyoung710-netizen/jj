@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>🧹 오늘의 청소당번 추첨</title>
+
+  <!-- Bootstrap 5 -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+
+  <!-- Bootstrap Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+  >
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ========================================
+       기본 설정
+    ======================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+
+      font-family:
+        "Pretendard",
+        "Noto Sans KR",
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at 15% 20%,
+          rgba(99, 102, 241, 0.35),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 85% 80%,
+          rgba(168, 85, 247, 0.3),
+          transparent 30%
+        ),
+        linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1e1b4b 50%,
+          #312e81 100%
+        );
+
+      overflow-x: hidden;
+    }
+
+    /* 배경 장식 */
+    .background-circle {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.04);
+
+      filter: blur(2px);
+
+      pointer-events: none;
+    }
+
+    .circle-1 {
+      top: -100px;
+      left: -100px;
+    }
+
+    .circle-2 {
+      right: -120px;
+      bottom: -100px;
+      width: 400px;
+      height: 400px;
+    }
+
+    /* ========================================
+       메인 카드
+    ======================================== */
+
+    .main-card {
+      position: relative;
+
+      width: 100%;
+      max-width: 850px;
+
+      margin: 30px auto;
+
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 32px;
+
+      background: rgba(255, 255, 255, 0.10);
+
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+      overflow: hidden;
+    }
+
+    /* ========================================
+       헤더
+    ======================================== */
+
+    .header-section {
+      padding: 50px 30px 35px;
+
+      text-align: center;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.25),
+          rgba(168, 85, 247, 0.15)
+        );
+    }
+
+    .icon-box {
+      width: 80px;
+      height: 80px;
+
+      margin: 0 auto 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 24px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #6366f1,
+          #a855f7
+        );
+
+      color: white;
+
+      font-size: 38px;
+
+      box-shadow:
+        0 15px 35px rgba(99, 102, 241, 0.4);
+
+      transform: rotate(-5deg);
+
+      transition: 0.3s;
+    }
+
+    .icon-box:hover {
+      transform: rotate(0deg) scale(1.08);
+    }
+
+    .main-title {
+      color: white;
+
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+
+      letter-spacing: -2px;
+
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.65);
+
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ========================================
+       설정 영역
+    ======================================== */
+
+    .content-section {
+      padding: 30px;
+    }
+
+    .info-card {
+      padding: 20px;
+
+      border-radius: 20px;
+
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      background: rgba(255, 255, 255, 0.06);
+
+      color: white;
+    }
+
+    .info-icon {
+      width: 45px;
+      height: 45px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 14px;
+
+      background: rgba(99, 102, 241, 0.2);
+
+      color: #a5b4fc;
+
+      font-size: 20px;
+    }
+
+    .info-label {
+      color: rgba(255, 255, 255, 0.5);
+
+      font-size: 13px;
+
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      color: white;
+
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    /* ========================================
+       추첨 버튼
+    ======================================== */
+
+    .draw-button {
+      position: relative;
+
+      width: 100%;
+
+      padding: 20px 25px;
+
+      border: 0;
+      border-radius: 20px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #6366f1,
+          #8b5cf6,
+          #a855f7
+        );
+
+      color: white;
+
+      font-size: 20px;
+      font-weight: 900;
+
+      box-shadow:
+        0 15px 35px rgba(99, 102, 241, 0.35);
+
+      overflow: hidden;
+
+      transition: all 0.25s ease;
+    }
+
+    .draw-button::before {
+      content: "";
+
+      position: absolute;
+
+      top: 0;
+      left: -100%;
+
+      width: 100%;
+      height: 100%;
+
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.25),
+          transparent
+        );
+
+      transition: 0.5s;
+    }
+
+    .draw-button:hover {
+      transform: translateY(-4px);
+
+      box-shadow:
+        0 20px 45px rgba(99, 102, 241, 0.5);
+    }
+
+    .draw-button:hover::before {
+      left: 100%;
+    }
+
+    .draw-button:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .draw-button.loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    /* ========================================
+       결과 영역
+    ======================================== */
+
+    .result-section {
+      margin-top: 30px;
+
+      min-height: 270px;
+
+      padding: 30px;
+
+      border-radius: 24px;
+
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      background:
+        rgba(0, 0, 0, 0.15);
+    }
+
+    .result-title {
+      text-align: center;
+
+      color: rgba(255, 255, 255, 0.55);
+
+      font-size: 14px;
+      font-weight: 700;
+
+      margin-bottom: 25px;
+    }
+
+    .result-title i {
+      color: #fbbf24;
+    }
+
+    /* 학생 카드 */
+    .student-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(5, 1fr);
+
+      gap: 15px;
+    }
+
+    .student-card {
+      position: relative;
+
+      min-height: 140px;
+
+      display: flex;
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 22px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(99, 102, 241, 0.9),
+          rgba(139, 92, 246, 0.9)
+        );
+
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      color: white;
+
+      box-shadow:
+        0 12px 25px rgba(0, 0, 0, 0.2);
+
+      animation: cardAppear 0.5s cubic-bezier(.17,.67,.35,1.3)
+        both;
+
+      overflow: hidden;
+    }
+
+    .student-card::before {
+      content: "";
+
+      position: absolute;
+
+      width: 100px;
+      height: 100px;
+
+      top: -50px;
+      right: -50px;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .student-number {
+      position: relative;
+
+      font-size: 32px;
+      font-weight: 900;
+
+      letter-spacing: -1px;
+    }
+
+    .student-label {
+      position: relative;
+
+      margin-top: 5px;
+
+      color: rgba(255, 255, 255, 0.65);
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .rank-badge {
+      position: absolute;
+
+      top: 10px;
+      left: 10px;
+
+      width: 28px;
+      height: 28px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.15);
+
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @keyframes cardAppear {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.7) rotate(-5deg);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0);
+      }
+    }
+
+    /* ========================================
+       빈 결과
+    ======================================== */
+
+    .empty-result {
+      min-height: 200px;
+
+      display: flex;
+      flex-direction: column;
+
+      align-items: center;
+      justify-content: center;
+
+      color: rgba(255, 255, 255, 0.35);
+
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 55px;
+
+      margin-bottom: 15px;
+
+      opacity: 0.5;
+    }
+
+    /* ========================================
+       하단
+    ======================================== */
+
+    .footer-section {
+      padding: 20px 30px 30px;
+
+      text-align: center;
+
+      color: rgba(255, 255, 255, 0.3);
+
+      font-size: 12px;
+    }
+
+    /* ========================================
+       SweetAlert 커스텀
+    ======================================== */
+
+    .swal2-popup {
+      border-radius: 24px !important;
+    }
+
+    /* ========================================
+       모바일
+    ======================================== */
+
+    @media (max-width: 768px) {
+
+      .main-card {
+        width: calc(100% - 20px);
+
+        margin: 10px auto;
+
+        border-radius: 25px;
+      }
+
+      .header-section {
+        padding: 35px 20px 25px;
+      }
+
+      .content-section {
+        padding: 20px;
+      }
+
+      .result-section {
+        padding: 20px;
+      }
+
+      .student-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+
+        gap: 12px;
+      }
+
+      .student-card {
+        min-height: 120px;
+      }
+
+      .student-card:last-child {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 400px) {
+
+      .student-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .main-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 배경 장식 -->
+  <div class="background-circle circle-1"></div>
+  <div class="background-circle circle-2"></div>
+
+
+  <!-- ==========================================
+       메인
+  =========================================== -->
+
+  <main class="container-fluid px-2 px-md-3">
+
+    <div class="main-card">
+
+      <!-- 헤더 -->
+      <section class="header-section">
+
+        <div class="icon-box">
+          <i class="bi bi-stars"></i>
+        </div>
+
+        <h1 class="main-title">
+          오늘의 청소당번
+        </h1>
+
+        <p class="subtitle">
+          공정하게, 랜덤으로 5명을 선정합니다 ✨
+        </p>
+
+      </section>
+
+
+      <!-- 컨텐츠 -->
+      <section class="content-section">
+
+        <!-- 정보 -->
+        <div class="row g-3 mb-4">
+
+          <div class="col-6">
+
+            <div class="info-card h-100">
+
+              <div class="d-flex align-items-center gap-3">
+
+                <div class="info-icon">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+
+                <div>
+
+                  <div class="info-label">
+                    전체 학생
+                  </div>
+
+                  <div class="info-value">
+                    30명
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="col-6">
+
+            <div class="info-card h-100">
+
+              <div class="d-flex align-items-center gap-3">
+
+                <div class="info-icon">
+                  <i class="bi bi-person-check-fill"></i>
+                </div>
+
+                <div>
+
+                  <div class="info-label">
+                    선정 인원
+                  </div>
+
+                  <div class="info-value">
+                    5명
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- 추첨 버튼 -->
+        <button
+          id="drawButton"
+          class="draw-button"
+        >
+
+          <i class="bi bi-shuffle me-2"></i>
+
+          청소당번 뽑기
+
+        </button>
+
+
+        <!-- 결과 -->
+        <section class="result-section">
+
+          <div class="result-title">
+
+            <i class="bi bi-trophy-fill me-1"></i>
+
+            TODAY'S CLEANING TEAM
+
+          </div>
+
+          <div id="result">
+
+            <div class="empty-result">
+
+              <div class="empty-icon">
+                🧹
+              </div>
+
+              <div class="text-lg font-bold">
+                아직 당번이 선정되지 않았어요
+              </div>
+
+              <div class="text-sm mt-2">
+                위의 버튼을 눌러 행운의 5명을 뽑아보세요!
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </section>
+
+
+      <!-- Footer -->
+      <footer class="footer-section">
+
+        <i class="bi bi-shield-check me-1"></i>
+
+        1번 ~ 30번 중 중복 없이 무작위 선정
+
+      </footer>
+
+    </div>
+
+  </main>
+
+
+  <!-- ==========================================
+       JavaScript
+  =========================================== -->
+
+  <script>
+
+    const drawButton =
+      document.getElementById("drawButton");
+
+    const result =
+      document.getElementById("result");
+
+
+    /*
+     * 1번 ~ 30번 학생 생성
+     */
+    const students =
+      Array.from(
+        { length: 30 },
+        (_, index) => index + 1
+      );
+
+
+    /*
+     * Fisher-Yates 셔플
+     *
+     * 30명의 학생을 완전히 섞은 다음
+     * 앞에서 5명을 선택합니다.
+     *
+     * 따라서 중복될 수 없습니다.
+     */
+    function shuffle(array) {
+
+      const copiedArray =
+        [...array];
+
+      for (
+        let i = copiedArray.length - 1;
+        i > 0;
+        i--
+      ) {
+
+        const randomIndex =
+          Math.floor(
+            Math.random() * (i + 1)
+          );
+
+        [
+          copiedArray[i],
+          copiedArray[randomIndex]
+        ] = [
+          copiedArray[randomIndex],
+          copiedArray[i]
+        ];
+      }
+
+      return copiedArray;
+    }
+
+
+    /*
+     * 학생 5명 선정
+     */
+    function selectStudents() {
+
+      const shuffled =
+        shuffle(students);
+
+      return shuffled.slice(0, 5);
+    }
+
+
+    /*
+     * 결과 화면 출력
+     */
+    function showResult(selectedStudents) {
+
+      result.innerHTML = `
+
+        <div class="student-grid">
+
+          ${selectedStudents
+            .map((student, index) => `
+
+              <div
+                class="student-card"
+                style="animation-delay: ${index * 0.12}s"
+              >
+
+                <div class="rank-badge">
+                  ${index + 1}
+                </div>
+
+                <div class="student-number">
+                  ${student}
+                </div>
+
+                <div class="student-label">
+                  번 학생
+                </div>
+
+              </div>
+
+            `)
+            .join("")}
+
+        </div>
+
+      `;
+    }
+
+
+    /*
+     * SweetAlert2 추첨 연출
+     */
+    async function drawStudents() {
+
+      // 버튼 중복 클릭 방지
+      drawButton.classList.add("loading");
+
+      drawButton.innerHTML = `
+        <span
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+        ></span>
+
+        행운의 번호를 찾는 중...
+      `;
+
+
+      /*
+       * 1단계
+       * 추첨 시작 알림
+       */
+      await Swal.fire({
+
+        title: "🎲 추첨을 시작합니다!",
+
+        html: `
+          <div class="text-gray-500 mt-2">
+            30명의 학생 중<br>
+            행운의 5명을 선정합니다.
+          </div>
+        `,
+
+        icon: "info",
+
+        confirmButtonText:
+          "두근두근...",
+
+        confirmButtonColor:
+          "#6366f1",
+
+        timer: 1200,
+
+        timerProgressBar: true,
+
+        allowOutsideClick: false
+
+      });
+
+
+      /*
+       * 실제 선정
+       */
+      const selectedStudents =
+        selectStudents();
+
+
+      /*
+       * 2단계
+       * 번호 공개 연출
+       */
+      let currentIndex = 0;
+
+
+      await Swal.fire({
+
+        title: "✨ 당첨자를 공개합니다!",
+
+        html: `
+          <div
+            id="rollingNumber"
+            style="
+              font-size: 60px;
+              font-weight: 900;
+              color: #6366f1;
+              margin: 20px 0;
+            "
+          >
+            ?
+          </div>
+
+          <div class="text-gray-400">
+            ${selectedStudents.length}명 중
+            ${selectedStudents.length}명 선정
+          </div>
+        `,
+
+        showConfirmButton: false,
+
+        allowOutsideClick: false,
+
+        timer: 1800,
+
+        didOpen: () => {
+
+          const rollingNumber =
+            document.getElementById(
+              "rollingNumber"
+            );
+
+          const interval =
+            setInterval(() => {
+
+              const randomNumber =
+                Math.floor(
+                  Math.random() * 30
+                ) + 1;
+
+              rollingNumber.textContent =
+                randomNumber + "번";
+
+            }, 80);
+
+
+          setTimeout(() => {
+            clearInterval(interval);
+          }, 1600);
+
+        }
+
+      });
+
+
+      /*
+       * 결과 표시
+       */
+      showResult(selectedStudents);
+
+
+      /*
+       * 성공 알림
+       */
+      await Swal.fire({
+
+        title: "🎉 청소당번 선정 완료!",
+
+        html: `
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              gap: 8px;
+              flex-wrap: wrap;
+              margin-top: 15px;
+            "
+          >
+
+            ${selectedStudents
+              .map(student => `
+                <span
+                  style="
+                    padding: 10px 16px;
+                    border-radius: 12px;
+                    background: #eef2ff;
+                    color: #4f46e5;
+                    font-size: 18px;
+                    font-weight: 800;
+                  "
+                >
+                  ${student}번
+                </span>
+              `)
+              .join("")}
+
+          </div>
+        `,
+
+        icon: "success",
+
+        confirmButtonText:
+          "확인",
+
+        confirmButtonColor:
+          "#6366f1",
+
+        showClass: {
+          popup:
+            "animate__animated animate__zoomIn"
+        }
+
+      });
+
+
+      /*
+       * 버튼 원상복구
+       */
+      drawButton.classList.remove("loading");
+
+      drawButton.innerHTML = `
+        <i class="bi bi-shuffle me-2"></i>
+        다시 뽑기
+      `;
+
+    }
+
+
+    /*
+     * 버튼 이벤트
+     */
+    drawButton.addEventListener(
+      "click",
+      drawStudents
+    );
+
+  </script>
+
+</body>
+</html>
